@@ -55,8 +55,10 @@ let properties = setArtMode(thisMode)
 // properties.prop = 'none'
 //properties.opArt = 'none'
 // properties.gradient = 'gradient'
-// plane ! spiral
+// properties.palette = 'solarflare'
 
+
+// plane ! spiral
 while (properties.stage === 'plane' && properties.spiral) {
   properties.stage = R.random_choice(stageList)
 }

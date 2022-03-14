@@ -80,6 +80,33 @@ const paletteDict = {
             { position: 1.0, color: '#fdf5e8' },
         ])
     },
+    blueglow: () => {
+        return positionColorsToPalette([
+            { position: 0.0, color: '#000000' },
+            { position: 0.3, color: '#000046' },
+            { position: 0.4, color: '#150097' },
+            { position: 0.48, color: '#c8d2ff' },
+            { position: 0.52, color: '#c6fcff' },
+            { position: 0.6, color: '#240046' },
+            { position: 0.7, color: '#000046' },
+            { position: 1.0, color: '#000000' },
+        ])
+    },
+    solarflare: () => {
+        return positionColorsToPalette([
+            { position: 0.0, color: '#000000' },
+            { position: 0.28, color: '#fb4605' },
+            { position: 0.38, color: '#fb6d05' },
+            { position: 0.44, color: '#fba601' },
+            { position: 0.48, color: '#fbdb32' },
+            { position: 0.5, color: '#fffbdc' },
+            { position: 0.52, color: '#fbdb32' },
+            { position: 0.56, color: '#fba601' },
+            { position: 0.62, color: '#fb6d05' },
+            { position: 0.72, color: '#fb4605' },
+            { position: 1.0, color: '#000000' },
+        ])
+    },
     orangewave: () => {
         return colorsToPalette(['#242424', '#281579', '#a501d4', '#ff00b4', '#ff910e', '#ff3600', '#242424']);    
     },

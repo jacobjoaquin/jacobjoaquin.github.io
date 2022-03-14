@@ -224,11 +224,11 @@ void main() {
   colorTable += envWaitRise(mod(focalPixDistance * 0.002 - phase, 1.0), 0.9);  // TODO: add nCycles
   colorTable += envWaitRise(mod(focalPixDistance * ${properties.bandfreq} + phase, 1.0), u_bandwidth) * u_thinDensity;
 
-  ${noiseType}
+  /*${noiseType}*/
   ${spiral}
   ${gradient}
   ${opArt}
-  ${spirit}
+  /*${spirit}*/
 
   // TODO: Remove with caution
   // colorTable += envWaitRise(st.x * 1.0, 0.425);
