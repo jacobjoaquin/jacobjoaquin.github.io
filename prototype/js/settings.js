@@ -1,5 +1,6 @@
 // ArtBlock Token Simulator
-// const seed = 8546634997381427
+// const seed = 870440850109135
+// const seed = 1397075586225615
 const seed = -1
 let tokenGeneration = genTokenData(123, seed)
 tokenData = tokenGeneration[0]

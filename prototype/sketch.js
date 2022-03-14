@@ -20,7 +20,7 @@ _________________________________________
 /*
 # TODO
 
-- Finte tune
+- Tune in / polish all the things
 - Rewrite code for efficiency, and length (gas)
 - Start with picture, then flash/fade once initial art is generated
 - Check if JS minimizer reduces obj keys, rename if necessary
@@ -30,6 +30,8 @@ _________________________________________
 - Modes: Classic Prismatics, Contemporary, Ink on Paper
 - Add other shader 
 - Optimize shader for efficiency, and length if possible (gas)
+- Concert static uniforms (that don't change during runtime) to ${inlines} in shader templates
+- Clean up and add noise types
 */
 
 
@@ -39,16 +41,20 @@ let thisMode = R.random_choice(artModeList)
 let properties = setArtMode(thisMode)
 
 // Overrides ------------------------------------------------------------------
+// properties.stage = 'plane'
 // properties.animation = 'magician'
 // properties.glass = 'refract'
 // properties.opArt = 'none'
-// properties.shaderNoise = 'i'
-// properties.spirit = false
-// properties.spiral = false
-// properties.palette = 'prismatics
+// properties.shaderNoise = 'ii'
+// properties.palette = 'prismatics'
 // properties.shaderNoise = 'none'
-properties.cameraFOV = 120
 
+// properties.spirit = true
+// properties.spiral = true
+// properties.cameraFOV = 120
+// properties.prop = 'none'
+//properties.opArt = 'none'
+properties.gradient = 'gradient'
 // plane ! spiral
 while (properties.stage === 'plane' && properties.spiral) {
   properties.stage = R.random_choice(stageList)
@@ -193,16 +199,19 @@ const stage = {
   plane: () => {
     const plane = new THREE.Mesh(geometryPlane, sm)
     plane.position.z = -400
+    // plane.setRotationFromAxisAngle(axis.x, TAU * 0.05)  // TODO: <---
     scene.add(plane);
   },
   box: () => {
     const roomScaleZ = R.random_num(2, 4)
-    // const roomLength = R.random_number(150, 500)
     const roomLength = 200
     const geometry = new THREE.BoxGeometry(roomLength, roomLength, roomLength * roomScaleZ);
     const roomMesh = new THREE.Mesh(geometry, sm);
     roomMesh.material.side = THREE.DoubleSide;
     scene.add(roomMesh)
+    if (R.random_bool(0.5)) {
+      roomMesh.setRotationFromAxisAngle(axis.z, TAU * 0.125)
+    }
   },
   tunnel: () => {
     const nSides = R.random_choice([3, 4, 5, 6, 8, 12, 128])
@@ -223,6 +232,7 @@ scene.add(pivot)
 
 // Set Props
 const prop = {
+  none: () => {},
   orb: () => {
     const radius = properties.orbRadius
     const widthSegments = 128

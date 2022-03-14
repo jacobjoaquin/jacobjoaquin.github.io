@@ -8,63 +8,49 @@ void main() {
 
 function generateShader(palette) {
   const div = (R.random_num(8, 32)).toFixed(1)
-  // const div = 2
   const gradientCode = {
     gradient: '',
-    crush: `rampPosition = normalCrush(rampPosition, ${div});`
+    crush: `colorTable = normalCrush(colorTable, ${div});`
   }
   const spiralCode = {
-    true: `  vec3 f2 = vec3(0.0);
-    float distanceAngle = atan(pixPosition.y - f2.y, pixPosition.x - f2.x);
-    rampPosition += distanceAngle / TAU * 1.0;`,
+    true: `colorTable = mod(colorTable + atan(pixPosition.y, pixPosition.x) / TAU, 1.0);`,
     false: ''
   }
   const opArtCode = {
     none: '',
-    // opArt: 'rampPosition += step(0.5, mod(pixPosition.z * 0.05 + st.x * 2.0 + st.y * 3.0 + phase, 1.0)) * phase;',
-    opArt: 'rampPosition += step(0.5, mod(pixPosition.z * 0.1 + st.x * u_opArtX + st.y * u_opArtY + phase, 1.0)) * phase;',
+    opArt: 'colorTable += step(0.5, mod(pixPosition.z * 0.1 + st.x * u_opArtX + st.y * u_opArtY + phase, 1.0)) * phase;',
   }
 
   const noiseCode = {
     none: '',
     i: `
-  // Noise
-    vec3 pixPositionOffset = pixPosition + vec3(-1000.0) + (u_random - 0.5) * 1000.0;
-    // vec3 pixPositionOffset = pixPosition * 0.1 + u_random  * 100.0;
-  
+    // Noise
+    vec3 pixPositionOffset = pixPosition + vec3(-1000.0) + (u_random - 0.5) * 1000.0;  
     float n = noise(pixPositionOffset.xy * 0.001 + pixPositionOffset.z * 0.5) * 20.0;
-    n = noise(pixPositionOffset.xy * 0.05 + n * 1.0);
-    n = envWaitRise(n, 0.5) * 1.0;
+    n = noise(pixPositionOffset.xy * 0.05 + n);
+    n = envWaitRise(n, 0.5);
   
     // Simplex
-    float sn = snoise((pixPositionOffset + n * 10.0) * 0.05) * 1.0;
-    // vec3 sn2 = vec3(pixPositionOffset * n * 0.01);
-    // sn = sn * snoise(sn2 * 100.0 + sn * 1.1) * 1.0;
+    float sn = snoise((pixPositionOffset + n * 10.0) * 0.05);
     sn = envWaitRise(sn, 0.5);
   
     // Color
-    rampPosition += sn * 0.5;
+    colorTable += sn * 0.5;
     `,
     ii: `
   // Noise
   vec3 pixPositionOffset = pixPosition + vec3(-1000.0) + (u_random - 0.5) * 1000.0;
-
-  float n = noise(pixPositionOffset.xy * 0.00001 + pixPositionOffset.z * 0.05) * 1.0;
+  float n = noise(pixPositionOffset.xy * 0.00001 + pixPositionOffset.z * 0.05);
   n = noise(pixPositionOffset.xy * 0.05 + n * 10.0);
-  // n = envWaitRise(n, 0.5) * 1.0;
 
   // Simplex
-  // stcopy.z *= 1.0;
-  float sn = snoise(pixPositionOffset * 0.05) * 1.0;
-  vec3 sn2 = vec3(pixPositionOffset * 0.005);
-  sn = snoise(sn2 * 10.0 + sn * 1.0);
-  sn = envWaitRise(sn, 0.3) * 1.0;
+  float sn = snoise(vec3(pixPositionOffset * 0.05) + snoise(pixPositionOffset * 0.05));
+  sn = envWaitRise(sn, 0.3);
 
   // Color
-  // float rampPosition = 0.0;
-  rampPosition += phase * 1.0;
-  rampPosition += sn * 0.25;
-  rampPosition += n * 0.2;
+  // colorTable += phase;
+  colorTable += sn * 0.25;
+  colorTable += n * 0.2;
   `,
 
   }
@@ -78,8 +64,9 @@ function generateShader(palette) {
   let spirit = ''
   if (properties.spirit) {
     spirit = `
-    rampPosition += sin(dist * u_spiritDist) * cos(pixPosition.z) * u_spiritCoef;
-    rampPosition = mod(rampPosition, 1.0);
+    float dist = focalPixDistance * (1.0 / 256.0);  // TODO: 256.0 is potential modulation input
+    colorTable += sin(dist * u_spiritDist) * cos(pixPosition.z) * u_spiritCoef;
+    colorTable = mod(colorTable, 1.0);
 `
   }
 
@@ -229,76 +216,49 @@ void main() {
   st.xy /= u_resolution;
   vec3 stcopy = st;
 
-  float phase = -u_phase;
+  float phase = u_phase;
   phase = mod(phase, 1.0);
+  
+  // TODO: Explore me
+  // Phase Modulation
+  // phase = 1.0 - phase;
   // phase += envWaitRise(phase, 0.5) * 1.0;
+  // phase = (sin(phase * TAU * 1.0) + 1.0) * 0.5;
 
+  // TODO: Remove with caution
   // Correct for Aspect
   // st.x -= 0.5;
   // st.x *= aspect;
   // st.x += 0.5;
 
   // Globals
+  float colorTable = 0.0;
   float zoomCoef = 1.0;
   st.xy -= 0.5;
   st.xy *= zoomCoef;
-  float rampPosition = 0.0;
-
-  
-  float angle = atan(st.y - u_focal.y, st.x - u_focal.x);
-  angle = 0.1;
-  float dist = distance(pixPosition, u_focal) * (1.0 / 256.0);
+  float focalPixDistance = distance(u_focal, pixPosition);
   float r = rand(stcopy.xy);
 
+  // Ripples
+  // float myModulation = envWaitRise(mod(myOffset * scale + -phase, 1.0), envRisePoint) * nCycles;
+  colorTable += envWaitRise(mod(focalPixDistance * 0.002 - phase, 1.0), 0.9) * 1.0;  // TODO: add nCycles
+  colorTable += envWaitRise(mod(focalPixDistance * ${properties.bandfreq} + phase, 1.0), u_bandwidth) * u_thinDensity;
 
-  // TODO: Implement new noise type ------
-  // // Noise
-  // float n = noise(pixPosition.xy * 0.05 + pixPosition.z * 1.0) * 0.5;
-  // n = noise(pixPosition.xy * 0.2 + n * 10.0);
-  // // n = envWaitRise(n, 0.7) * 0.1;
-
-  // // Simplex
-  // // stn.z *= 1.0;
-  // float sn = snoise(pixPosition * 0.01) * 1.0;
-  // vec3 sn2 = vec3(pixPosition * 0.001);
-  // sn = snoise(sn2 * 5.0 + sn * 1.0 + n * 0.1);
-  // sn = envWaitRise(sn, 0.3) * 1.0;
-
-  // rampPosition += sn * 0.25;
-  // ---------------------------------------
-  
   ${noiseType}
   ${spiral}
-
-  float x = distance(pixPosition, u_focal);
-  x *= 0.002;  // TODO: Revisit me (was 0.004)
-  x += -phase;
-  x = mod(x, 1.0);
-  x = envWaitRise(x, 0.423);  // TODO: Revist me (was off)
-  rampPosition += x;
-
-  // TODO: Revist
-  rampPosition += envWaitRise(st.x * 1.0, 0.425);
-
-  // Thin
-  float distThin = distance(u_focal, pixPosition);
-  distThin *= ${properties.bandfreq};
-  distThin += phase;
-  distThin = mod(distThin, 1.0);
-  distThin = envWaitRise(distThin, u_bandwidth) * u_thinDensity;
-  rampPosition -= distThin * 1.0;
-  rampPosition = mod(rampPosition, 1.0);
-
   ${gradient}
   ${opArt}
   ${spirit}
 
-  // Noise + Palette Cycle
-  rampPosition += r * 0.03 + phase * u_cycleFreq;
+  // TODO: Remove with caution
+  // colorTable += envWaitRise(st.x * 1.0, 0.425);
 
-  // Create color out
-  rampPosition = mod(rampPosition, 1.0);
-  gl_FragColor = texture2D(u_texture, vec2(rampPosition, 1.0));
+  // Noise + Palette Cycle
+  colorTable += phase * u_cycleFreq;
+  colorTable += r * 0.03;
+  
+  // Out
+  gl_FragColor = texture2D(u_texture, vec2(mod(colorTable, 1.0), 1.0));
 }`
 
   return template
