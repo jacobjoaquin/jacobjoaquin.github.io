@@ -54,8 +54,9 @@ let properties = setArtMode(thisMode)
 // properties.cameraFOV = 120
 // properties.prop = 'none'
 //properties.opArt = 'none'
-properties.gradient = 'gradient'
+// properties.gradient = 'gradient'
 // plane ! spiral
+
 while (properties.stage === 'plane' && properties.spiral) {
   properties.stage = R.random_choice(stageList)
 }

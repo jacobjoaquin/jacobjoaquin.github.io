@@ -10,7 +10,8 @@ function generateShader(palette) {
   const div = (R.random_num(8, 32)).toFixed(1)
   const gradientCode = {
     gradient: '',
-    crush: `colorTable = normalCrush(colorTable, ${div});`
+    crush: `colorTable = floor(colorTable * ${div}) / ${div};`
+
   }
   const spiralCode = {
     true: `colorTable = mod(colorTable + atan(pixPosition.y, pixPosition.x) / TAU, 1.0);`,
@@ -48,9 +49,7 @@ function generateShader(palette) {
   sn = envWaitRise(sn, 0.3);
 
   // Color
-  // colorTable += phase;
-  colorTable += sn * 0.25;
-  colorTable += n * 0.2;
+  colorTable += sn * 0.25 + n * 0.2;
   `,
 
   }
@@ -59,7 +58,6 @@ function generateShader(palette) {
   const spiral = spiralCode[properties.spiral]
   const opArt = opArtCode[properties.opArt]
   const noiseType = noiseCode[properties.shaderNoise]
-  // console.log(opArt)
 
   let spirit = ''
   if (properties.spirit) {
@@ -109,15 +107,6 @@ float envWaitRise(float v, float p0) {
   return clamp((v - p0) / (1.0 - p0), 0.0, 1.0);
 }
 
-mat2 rotate2d(float _angle){
-  // https://thebookofshaders.com/08/
-  return mat2(cos(_angle), -sin(_angle), sin(_angle), cos(_angle));
-}
-
-// float random (vec2 st) {
-//   return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-// }
-
 // 2D Noise based on Morgan McGuire @morgan3d
 // https://www.shadertoy.com/view/4dS3Wd
 // https://thebookofshaders.com/11/
@@ -142,10 +131,6 @@ float noise (vec2 st) {
     return mix(a, b, u.x) +
             (c - a)* u.y * (1.0 - u.x) +
             (d - b) * u.x * u.y;
-}
-
-float normalCrush(float v, float depth) {
-  return floor(v * depth) / depth;
 }
 
 vec3 random3(vec3 c) {
@@ -197,13 +182,7 @@ float snoise(vec3 p) {
   return dot(d, vec4(52.0));
 }
 
-vec2 kaleidoscope2d(vec2 v) {
-  v -= 0.5;
-  v = abs(v);
-  v += 0.5;
-  return v;
-}
-
+// TODO: Not used. Use it or lose it.
 float triangle(float t) {
   t /= TAU;
   return 4.0 * abs(t - floor(t + 0.75) + 0.25) - 1.0;
@@ -215,6 +194,7 @@ void main() {
   vec3 fragCoord = gl_FragCoord.xyz;
   st.xy /= u_resolution;
   vec3 stcopy = st;
+
 
   float phase = u_phase;
   phase = mod(phase, 1.0);
@@ -233,7 +213,7 @@ void main() {
 
   // Globals
   float colorTable = 0.0;
-  float zoomCoef = 1.0;
+  float zoomCoef = 1.0;  // TODO: Modulation source? Changes Optical
   st.xy -= 0.5;
   st.xy *= zoomCoef;
   float focalPixDistance = distance(u_focal, pixPosition);
@@ -241,7 +221,7 @@ void main() {
 
   // Ripples
   // float myModulation = envWaitRise(mod(myOffset * scale + -phase, 1.0), envRisePoint) * nCycles;
-  colorTable += envWaitRise(mod(focalPixDistance * 0.002 - phase, 1.0), 0.9) * 1.0;  // TODO: add nCycles
+  colorTable += envWaitRise(mod(focalPixDistance * 0.002 - phase, 1.0), 0.9);  // TODO: add nCycles
   colorTable += envWaitRise(mod(focalPixDistance * ${properties.bandfreq} + phase, 1.0), u_bandwidth) * u_thinDensity;
 
   ${noiseType}
