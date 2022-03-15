@@ -19,16 +19,14 @@ const propList = ['orb', 'spherePack2', 'grid']
 const propShapeList = ['n/a', 'sphere', 'ring']
 const propMaterialList = ['cubecamera', 'sm']
 const propGlassList = ['reflect', 'refract']
-const opArtList = ['none', 'opArt']
 const spiritList = ['none', 'spirit']
 const animationList = ['none', 'magician', 'pong']
-const shaderNoiseList = ['none', 'i', 'ii']
 
 function createBaseProperties(override) {
     const properties = {
         cameraFOV: R.random_num(60, 120),
         palette: R.random_choice(paletteList),
-        gradient: R.random_choice(gradientList),
+        crush: R.random_bool(0.5),
         stage: R.random_choice(stageList),
         prop: R.random_choice(propList),
         propShape: R.random_choice(propShapeList),
@@ -42,10 +40,9 @@ function createBaseProperties(override) {
         smudge: { x: R.random_dec(), y: R.random_dec(), z: R.random_dec() },
         bandwidth: R.random_num(0.1, 0.9),
         bandfreq: R.random_num(0.05, 0.0005),
-        opArt: R.random_choice(opArtList),
+        opArt: R.random_bool(0.5),
         opArtX: R.random_num(-16, 16),
         opArtY: R.random_num(-16, 16),
-        shaderNoise: R.random_choice(shaderNoiseList),
         spirit: R.random_bool(0.5),
         spiritDist: R.random_num(1, 200),
         spiritCoef: R.random_num(0.01, 0.2),

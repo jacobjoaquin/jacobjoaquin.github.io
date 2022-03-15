@@ -38,7 +38,7 @@ _________________________________________
 // let properties = createBaseProperties()
 let thisMode = R.random_choice(artModeList)
 // thisMode = 'relationship'
-let properties = setArtMode(thisMode)
+let P = setArtMode(thisMode)
 
 // Overrides ------------------------------------------------------------------
 // properties.stage = 'plane'
@@ -51,7 +51,7 @@ let properties = setArtMode(thisMode)
 
 // properties.spirit = true
 // properties.spiral = true
-// properties.cameraFOV = 120
+P.cameraFOV = 120
 // properties.prop = 'none'
 //properties.opArt = 'none'
 // properties.gradient = 'gradient'
@@ -59,28 +59,28 @@ let properties = setArtMode(thisMode)
 
 
 // plane ! spiral
-while (properties.stage === 'plane' && properties.spiral) {
-  properties.stage = R.random_choice(stageList)
+while (P.stage === 'plane' && P.spiral) {
+  P.stage = R.random_choice(stageList)
 }
 
 // Grey => Crush
-if (properties.palette === 'grey' && properties.gradient === 'gradient') {
-  properties.gradient = 'crush'
+if (P.palette === 'grey' && P.gradient === 'gradient') {
+  P.gradient = 'crush'
 }
 
-if (properties.animation === 'magician') {
-  properties.orbRadius *= 0.6185
+if (P.animation === 'magician') {
+  P.orbRadius *= 0.6185
 }
 // ----------------------------------------------------------------------------
 
 // properties = propertiesDev
 console.log('initial properties:')
-console.log(properties)
+console.log(P)
 
 // Sketch Properties
-const uniformRandom = properties.smudge
-const uniformFocal = new THREE.Vector3(properties.focalLength, 0, properties.focalZ)
-uniformFocal.applyAxisAngle(axis.z, properties.focalAngle)
+const uniformRandom = P.smudge
+const uniformFocal = new THREE.Vector3(P.focalLength, 0, P.focalZ)
+uniformFocal.applyAxisAngle(axis.z, P.focalAngle)
 const cubeCameraResolution = 1024
 
 // Set Palette
@@ -91,7 +91,7 @@ const paletteModes = {
   orangewave: 4,
   grey: 11
 }
-palette = paletteDict[properties.palette]()
+palette = paletteDict[P.palette]()
 
 // Canvas
 const canvas = document.querySelector('#c');
@@ -109,7 +109,7 @@ const dims = getClientDim(renderer)
 const scene = new THREE.Scene();
 
 // Camera
-const fov = properties.cameraFOV
+const fov = P.cameraFOV
 const aspect = 1
 const near = 0.1
 const far = 1000
@@ -147,7 +147,7 @@ const glass = {
     cubeCameraMaterialProperties.refractionRatio = 0.9
   }
 }
-glass[properties.glass]()
+glass[P.glass]()
 const cubeCameraMaterial = new THREE.MeshPhongMaterial(cubeCameraMaterialProperties);
 
 // Set Lights
@@ -165,11 +165,11 @@ const uniforms = {
   u_random: { value: uniformRandom },
   u_focal: { value: uniformFocal },
   u_texture: { type: 't', value: texture.texture },
-  u_bandwidth: { value: properties.bandwidth },
-  u_opArtX: { value: properties.opArtX },
-  u_opArtY: { value: properties.opArtY },
-  u_spiritDist: { value: properties.spiritDist },
-  u_spiritCoef: { value: properties.spiritCoef },
+  u_bandwidth: { value: P.bandwidth },
+  u_opArtX: { value: P.opArtX },
+  u_opArtY: { value: P.opArtY },
+  u_spiritDist: { value: P.spiritDist },
+  u_spiritCoef: { value: P.spiritCoef },
   u_cycleFreq: { value: R.random_choice([-2, -1, 0, 1, 2]) },
   // u_thinDensity: { value: R.random_choice([-0.5, 1, 1, 1, 1, 2, 4, 8, 16]) }, // TODO: <----
   u_thinDensity: { value: 1.0 },
@@ -191,7 +191,7 @@ const propMaterials = {
   cubecamera: cubeCameraMaterial,
   sm: sm
 }
-const material = propMaterials[properties.propMaterial]
+const material = propMaterials[P.propMaterial]
 
 // Set Background 
 scene.background = new THREE.Color('#E0C9A6')
@@ -237,7 +237,7 @@ scene.add(pivot)
 const prop = {
   none: () => {},
   orb: () => {
-    const radius = properties.orbRadius
+    const radius = P.orbRadius
     const widthSegments = 128
     const heightSegments = 64
     const size = 4
@@ -341,7 +341,7 @@ class Pong {
   z0 = -200
   z1 = 0
   r = 50
-  speed = 0.75
+  speed = 0.5
 
   constructor() {
     this.x0 += this.r
@@ -396,21 +396,21 @@ animations = {
 
 
 animationQueue.push(() => { cubeCamera.setRotationFromAxisAngle(axis.z, phase2 * TAU * 1.0) })
-animationQueue.push(animations[properties.animation])
+animationQueue.push(animations[P.animation])
 
 
 // Do the things
-stage[properties.stage]()
-prop[properties.prop]()
+stage[P.stage]()
+prop[P.prop]()
 
 // Main
-const freq = 1 / 16
-let nFrames = 60 * 30
+const freq = 1 / 24
+let nFrames = 60 * 30;
 let frameCount = -2
 let lastTime = 0
 let phase = R.random_dec()
 let phase2 = R.random_dec()
-let freq2 = freq * 0.5 * R.random_choice([-1, 1])
+let freq2 = freq * 0.25 * R.random_choice([-1, 1])
 let animationPhase = R.random_dec()
 
 const doAnimation = R.random_bool(0.5)
@@ -464,7 +464,7 @@ function animate(time) {
 }
 
 console.log('final properties:')
-console.log(properties)
+console.log(P)
 camera.aspect = canvas.clientWidth / canvas.clientHeight;
 camera.updateProjectionMatrix();
 uniforms.u_resolution.value.x = dims.width
