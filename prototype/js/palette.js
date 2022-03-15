@@ -80,6 +80,12 @@ const paletteDict = {
             { position: 1.0, color: '#fdf5e8' },
         ])
     },
+    orangewave: () => {
+        return colorsToPalette(['#242424', '#281579', '#a501d4', '#ff00b4', '#ff910e', '#ff3600', '#242424']);    
+    },
+    grey: () => {
+        return colorsToPalette(['#000000', '#ffffff', '#000000']);    
+    },
     blueglow: () => {
         return positionColorsToPalette([
             { position: 0.0, color: '#000000' },
@@ -94,7 +100,7 @@ const paletteDict = {
     },
     solarflare: () => {
         return positionColorsToPalette([
-            { position: 0.0, color: '#000000' },
+            { position: 0.0, color: '#101010' },
             { position: 0.28, color: '#fb4605' },
             { position: 0.38, color: '#fb6d05' },
             { position: 0.44, color: '#fba601' },
@@ -104,13 +110,34 @@ const paletteDict = {
             { position: 0.56, color: '#fba601' },
             { position: 0.62, color: '#fb6d05' },
             { position: 0.72, color: '#fb4605' },
-            { position: 1.0, color: '#000000' },
+            { position: 1.0, color: '#101010' },
         ])
     },
-    orangewave: () => {
-        return colorsToPalette(['#242424', '#281579', '#a501d4', '#ff00b4', '#ff910e', '#ff3600', '#242424']);    
+    furs: () => {
+        return colorsToPalette(['#fcfcfa', '#d4d385','#e2b146','#d1a797','#4c3472','#060709','#fcfcfa']);    
     },
-    grey: () => {
-        return colorsToPalette(['#000000', '#ffffff', '#000000']);    
+    blackandwhite: () => {
+        return positionColorsToPalette([
+            { position: 0.0, color: '#000000' },
+            { position: 0.5, color: '#000000' },
+            { position: 0.5, color: '#ffffff' },
+            { position: 1.0, color: '#ffffff' },
+        ])
     },
+
+    temp: () => {
+        return colorsToPalette(['#eda986', '#e2966f','#eda986']);    
+    },
+    temp2: () => {
+        return positionColorsToPalette([
+            { position: 0.0, color: '#101010' },
+            { position: 0.1, color: '#101010' },
+            { position: 0.1, color: '#eda986' },
+            { position: 0.5, color: '#e2966f' },
+            { position: 0.9, color: '#eda986' },
+            { position: 0.9, color: '#101010' },
+            { position: 1.0, color: '#101010' },
+        ])
+    },
+
 }

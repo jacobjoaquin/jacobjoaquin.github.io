@@ -3,6 +3,7 @@
 // const seed = 1397075586225615
 // const seed = 7038556631262292
 // const seed = 1605252877022328
+// const seed = 4524443284489522
 const seed = -1
 let tokenGeneration = genTokenData(123, seed)
 tokenData = tokenGeneration[0]
@@ -12,7 +13,8 @@ const R = new Random()
 
 // Mode lists
 const artModeList = ['random', 'keeper', 'vas', 'relationship']
-const paletteList = ['prismatics', 'prismaticfade', 'pinkband', 'purpleband', 'orangewave', 'blueglow', 'solarflare']
+const paletteList = ['prismatics', 'prismaticfade', 'pinkband', 'purpleband', 'orangewave',
+    'blueglow', 'solarflare', 'furs']
 const gradientList = ['gradient', 'crush']
 const stageList = ['plane', 'box', 'tunnel']
 const propList = ['orb', 'spherePack2', 'grid']
@@ -25,6 +27,7 @@ const animationList = ['none', 'magician', 'pong']
 function createBaseProperties(override) {
     const properties = {
         cameraFOV: R.random_num(60, 120),
+        cameraSpin: R.random_bool(0.5),
         palette: R.random_choice(paletteList),
         crush: R.random_bool(0.5),
         stage: R.random_choice(stageList),

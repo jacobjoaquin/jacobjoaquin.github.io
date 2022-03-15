@@ -105,12 +105,13 @@ void main() {
   ${opArt}
   ${spirit}
 
+
   // TODO: Remove with caution
   // colorTable += envWaitRise(st.x * 1.0, 0.425);
 
   // Noise + Palette Cycle
   colorTable += phase * u_cycleFreq;
-  colorTable += r * 0.03;
+  // colorTable += r * 0.03;
   
   // Out
   gl_FragColor = texture2D(u_texture, vec2(mod(colorTable, 1.0), 1.0));

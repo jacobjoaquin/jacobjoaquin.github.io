@@ -55,8 +55,9 @@ P.cameraFOV = 120
 // properties.prop = 'none'
 //properties.opArt = 'none'
 // properties.gradient = 'gradient'
-// properties.palette = 'solarflare'
-
+// P.palette = 'solarflare'
+// P.palette = 'blackandwhite'
+// P.prop = 'none'
 
 // plane ! spiral
 while (P.stage === 'plane' && P.spiral) {
@@ -84,13 +85,6 @@ uniformFocal.applyAxisAngle(axis.z, P.focalAngle)
 const cubeCameraResolution = 1024
 
 // Set Palette
-const paletteModes = {
-  prismatics: 7,
-  prismaticfade: 9,
-  pinkband: 22,
-  orangewave: 4,
-  grey: 11
-}
 palette = paletteDict[P.palette]()
 
 // Canvas
@@ -119,7 +113,7 @@ camera.position.z = -100
 // const width = 500
 // const height = width
 // const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-// camera.position.z = -100
+// camera.position.z = 0
 
 scene.add(camera);
 
@@ -132,7 +126,7 @@ const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(cubeCameraResolution, {
 cubeRenderTarget.texture.mapping = THREE.CubeRefractionMapping
 const cubeCamera = new THREE.CubeCamera(1, 1024, cubeRenderTarget)
 const cubeCameraMaterialProperties = {
-  color: 0xddff88,
+  // color: 0xddff88,
   envMap: cubeRenderTarget.texture,
   refractionRatio: 0.618,
   // reflectivity: 1.0,
@@ -395,6 +389,9 @@ animations = {
 }
 
 
+if (P.cameraSpin) {
+  animationQueue.push(() => {camera.setRotationFromAxisAngle(axis.z, phase2 * TAU * 1.0)})
+}
 animationQueue.push(() => { cubeCamera.setRotationFromAxisAngle(axis.z, phase2 * TAU * 1.0) })
 animationQueue.push(animations[P.animation])
 
@@ -414,7 +411,6 @@ let freq2 = freq * 0.25 * R.random_choice([-1, 1])
 let animationPhase = R.random_dec()
 
 const doAnimation = R.random_bool(0.5)
-
 function animate(time) {
   // Handle Resize
   if (resizeRendererToDisplaySize(renderer)) {
@@ -428,10 +424,8 @@ function animate(time) {
 
   phase += ((time - lastTime) / 1000.0) * freq;
   phase = normalMod(phase)
-  // console.log(phase)
   phase2 += ((time - lastTime) / 1000.0) * freq2;
   phase2 = normalMod(phase2)
-
   animationPhase += 1 / 1000
   animationPhase = normalMod(animationPhase)
 
@@ -447,6 +441,8 @@ function animate(time) {
   // Update Renders
   cubeCamera.update(renderer, scene)
   renderer.render(scene, camera);
+
+
 
   // Capture Animation
   // if (frameCount >= 1 && frameCount <= nFrames) {
