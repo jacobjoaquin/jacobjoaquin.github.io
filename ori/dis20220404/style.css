@@ -1,0 +1,22 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #333333;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* width: 540px;
+  height: 540px; */
+  /* width: 800px;
+  height: 800px; */
+  /* width: 1080px;
+  height: 1080px; */
+  /* width: 540px;
+  height: 960px; */
+  background: #444444;
+  display: block;
+}
